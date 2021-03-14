@@ -14,7 +14,7 @@ class App extends Component {
         </header>
         <main>
           <SpotifySlider />
-          {/* <Signup /> */}
+          <Signup />
         </main>
       </Fragment>
     );
