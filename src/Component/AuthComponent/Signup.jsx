@@ -1,5 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import "./auth.css";
+import firebase from "../../firsebase";
+
+import { toast } from "react-toastify";
+
+import md5 from "md5";
+
 class Signup extends Component {
     state = {
         email: "",
@@ -13,10 +19,34 @@ class Signup extends Component {
     handleChange = e => {
         this.setState({[e.target.name]: e.target.value });
     }
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault();
+        try {
         let { email, confirmEmail, password, profile, dob} = this.state;
-        console.log({ email, confirmEmail, password, profile, dob});
+            console.log({ email, confirmEmail, password, profile, dob });
+            //auth
+
+            let userData = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            userData.user.sendEmailVerification();
+            let message = `verification email has been sent to ${email} please confirm it and signin..`;
+            toast.success(message);
+            console.log(userData);
+            userData.user.updateProfile({
+                displayName: profile,
+                photoURL: `http://www.gravatar.com/avatar/${md5(email)}?d=identicon`,
+            });
+            //store information into firebase realtime database
+            await firebase.database().ref("/users" + userData.user.uid).set({
+                email: userData.user.email,
+                photoURL: userData.user.photoURL,
+                profile: userData.user.displayName,
+                date: new date().toLocalDateString(),
+            })
+        } catch (err) {
+            console.log(err);
+            toast.error(err.message);
+        }
+        
     }
     render() {
         let { email, confirmEmail, password, profile, dob, gender, } = this.state;
@@ -25,7 +55,7 @@ class Signup extends Component {
                 <section id="authSection" className="col-md-4 mx-auto my-2 card">
                     <article className="card-body">
                         <h4>Sign up with your email address</h4>
-                        <form>
+                        <form onSubmit={this.handleSubmit}>
                             {/* email start*/}
                             <div className="form-group">
                                 <label>What's your email?</label>
@@ -97,13 +127,13 @@ class Signup extends Component {
                             {/* end date */}
 
                             {/* start gender */}
-                            <div className="form-group">
+                            <div className="form-group" name="gender" value={gender}>
                                  <label>What's your gender?</label>
-                                <input type="radio" name="gender" value={gender}onChange={this.handleChange}/>
+                                <input type="radio" onChange={this.handleChange}/>
                             Male
-                           <input type="radio" name="gender"value={gender}onChange={this.handleChange} />
+                           <input type="radio" onChange={this.handleChange} />
                             Female
-                            <input type="radio" name="gender"value={gender} onChange={this.handleChange}/>
+                            <input type="radio" onChange={this.handleChange}/>
                             Non-binary
                             </div>
                             {/* end gender */}

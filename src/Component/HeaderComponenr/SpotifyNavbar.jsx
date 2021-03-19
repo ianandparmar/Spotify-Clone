@@ -4,16 +4,18 @@ import '../HeaderComponenr/SpotifyNavbar.css';
 import SpotifyMenus from './MenuComponent/SpotifyMenus';
 import SpotifyLogo from './SpotifyLogo';
 
+import { Link } from "react-router-dom";
+
 const SpotifyNavbar = () => {
            return (
             <Fragment>
                 <section id="spotifyNavbarBlock">
                     <article>
                         <div className="logoBlock">
-                            <a href="/">
+                            <Link to="/">
                                 {/* <SpotifyLogo/> */}
                                 <SpotifyLogo/>
-                            </a>
+                            </Link>
                         </div>
                            <div className="menuBlock">
                                <SpotifyMenus/>
